@@ -11,7 +11,7 @@ internal class Program
         var sw = new Stopwatch();
         
         sw.Start();
-        ImageShading.Core.Painter.ShadeImage("chill_guy.jpg", "shaded.png", new SubtleShader());
+        ImageShading.Core.Painter.ShadeImage("chill_guy.jpg", "shaded.png", new InvertShader());
         sw.Stop();
         Console.WriteLine($"Time: {sw.Elapsed}");
     }

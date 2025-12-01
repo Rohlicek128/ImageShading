@@ -5,7 +5,7 @@ namespace LibExample;
 
 public class InvertShader : Fragment
 {
-    public override Color SetFragment(int x, int y)
+    public override Color SetFragment(float x, float y)
     {
         const int off = 250;
         var pixel = SampleScreenBuffer(x, y);

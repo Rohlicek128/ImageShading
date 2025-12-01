@@ -5,8 +5,9 @@ namespace LibExample;
 
 public class SubtleShader : Fragment
 {
-    public override Color SetFragment(int x, int y)
+    public override Color SetFragment(float x, float y)
     {
-        return SampleScreenBuffer(x + 968 / 2, y);
+        var pixel = SampleScreenBuffer(x, y);
+        return Color.FromArgb(255, pixel.R, 0, 0);
     }
 }

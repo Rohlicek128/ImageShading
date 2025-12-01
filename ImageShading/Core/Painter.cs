@@ -1,13 +1,14 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace ImageShading.Core;
 
 public static class Painter
 {
-    public static void PaintPng(string path, Color color, int width)
+    public static void ColorFillPng(string path, Color color, int width, int height)
     {
-        using var b = new Bitmap(width, width);
+        using var b = new Bitmap(width, height);
         using var g = Graphics.FromImage(b);
         
         g.Clear(color);
@@ -15,47 +16,54 @@ public static class Painter
         b.Save(path, ImageFormat.Png);
     }
 
-    public static void EditPng(string inPath, string outPath)
-    {
-        using var i = Image.FromFile(inPath);
-        using var b = new Bitmap(i.Width, i.Height);
-        using var g = Graphics.FromImage(b);
-
-        g.DrawImage(i, new Rectangle(0, 0, i.Width, i.Height));
-        
-        g.FillEllipse(new SolidBrush(Color.Yellow), new Rectangle(0, 0, 100, 100));
-        
-        /*for (var x = 0; x < b.Width; x++)
-        {
-            for (var y = 0; y < b.Width; y++)
-            {
-                b.SetPixel(x, y, Color.FromArgb(255, x, y, 0));
-            }
-        }*/
-        
-        b.Save(outPath, ImageFormat.Png);
-    }
-
     public static void ShadeImage(string inPath, string outPath, Fragment fragShader)
     {
         using var i = Image.FromFile(inPath);
-        using var b = new Bitmap(i.Width, i.Height);
-        fragShader.SetResources(b);
+        using var b = new Bitmap(i.Width, i.Height, PixelFormat.Format32bppArgb);
+        var width = i.Width;
+        var height = i.Height;
+        
         using var g = Graphics.FromImage(b);
+        g.DrawImage(i, new Rectangle(0, 0, width, height));
+
         
-        g.DrawImage(i, new Rectangle(0, 0, i.Width, i.Height));
+        var data = b.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, b.PixelFormat);
+        var bytesPerPixel = Image.GetPixelFormatSize(b.PixelFormat) / 8;
+        var stride = data.Stride;
         
-        Console.WriteLine($"[SHADING]  Line progress ({b.Width}): [");
-        for (var x = 0; x < b.Width; x++)
+        var inputBuffer = new byte[stride * height];
+        Marshal.Copy(data.Scan0, inputBuffer, 0, inputBuffer.Length);
+        Buffer buffer;
+        buffer.Data = inputBuffer;
+        buffer.Width = width;
+        buffer.Height = height;
+        buffer.Stride = stride;
+        fragShader.SetBuffer(buffer);
+        
+        
+        Console.WriteLine($"[SHADING]  Rendering ({width}/{height})");
+        unsafe
         {
-            for (var y = 0; y < b.Height; y++)
+            var pixelPtr = (byte*)data.Scan0;
+            
+            Parallel.For(0, height, y =>
             {
-                b.SetPixel(x, y, fragShader.SetFragment(x, y));
-            }
-            Console.Write("/");
+                var row = pixelPtr + y * stride;
+
+                for (var x = 0; x < width; x++)
+                {
+                    var color = fragShader.SetFragment(x / (float)width, y / (float)height);
+                    row[x * bytesPerPixel + 0] = color.B;
+                    row[x * bytesPerPixel + 1] = color.G;
+                    row[x * bytesPerPixel + 2] = color.R;
+                    row[x * bytesPerPixel + 3] = color.A;
+                }
+                //Console.Write("/");
+            });
         }
-        Console.WriteLine("\n]");
+        //Console.WriteLine("\n]");
         
+        b.UnlockBits(data);
         b.Save(outPath, ImageFormat.Png);
     }
 }

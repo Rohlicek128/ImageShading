@@ -1,22 +1,14 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using ImageShading.Math;
 
 namespace ImageShading.Core;
 
 public static class Painter
 {
-    public static void ColorFillPng(string path, Color color, int width, int height)
-    {
-        using var b = new Bitmap(width, height);
-        using var g = Graphics.FromImage(b);
-        
-        g.Clear(color);
-        
-        b.Save(path, ImageFormat.Png);
-    }
-
-    public static void ShadeImage(string inPath, string outPath, Fragment fragShader)
+    public static void ShadeImage(string inPath, string outPath, Fragment fragShader, bool open = false)
     {
         using var i = Image.FromFile(inPath);
         using var b = new Bitmap(i.Width, i.Height, PixelFormat.Format32bppArgb);
@@ -41,7 +33,7 @@ public static class Painter
         fragShader.SetBuffer(buffer);
         
         
-        Console.WriteLine($"[SHADING]  Rendering ({width}/{height})");
+        Console.WriteLine($"[SHADING] Rendering ({width} | {height})");
         unsafe
         {
             var pixelPtr = (byte*)data.Scan0;
@@ -52,11 +44,11 @@ public static class Painter
 
                 for (var x = 0; x < width; x++)
                 {
-                    var color = fragShader.SetFragment(x / (float)width, y / (float)height);
-                    row[x * bytesPerPixel + 0] = color.B;
-                    row[x * bytesPerPixel + 1] = color.G;
-                    row[x * bytesPerPixel + 2] = color.R;
-                    row[x * bytesPerPixel + 3] = color.A;
+                    var color = fragShader.SetFragment(new Vec2(x / (float)width, y / (float)height));
+                    row[x * bytesPerPixel + 0] = (byte)(color.B * 255f);
+                    row[x * bytesPerPixel + 1] = (byte)(color.G * 255f);
+                    row[x * bytesPerPixel + 2] = (byte)(color.R * 255f);
+                    row[x * bytesPerPixel + 3] = (byte)(color.A * 255f);
                 }
                 //Console.Write("/");
             });
@@ -65,5 +57,26 @@ public static class Painter
         
         b.UnlockBits(data);
         b.Save(outPath, ImageFormat.Png);
+        
+        if (open) OpenImage(outPath);
+    }
+
+    public static void OpenImage(string path)
+    {
+        Console.WriteLine($"[SHADING] Opening \"{path}\"");
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = path,
+                UseShellExecute = true,
+                Verb = "open"
+            };
+            Process.Start(startInfo);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[ERROR] Failed to open \"{path}\": {e.Message}");
+        }
     }
 }

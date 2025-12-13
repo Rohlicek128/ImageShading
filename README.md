@@ -1,6 +1,6 @@
 # Image Shading
 A C# library that allows you to write your own fragment shader.
-U can then use you shader o edit some image.
+You can then use your shader to edit an image.
 
 ## Integration
 
@@ -10,8 +10,8 @@ U can then use you shader o edit some image.
 3. Locate the **DLL** and add reference to it
 
 ### Link Library to Project
-1. Add Library to your solution
-2. In Visual Studio, hgclick _Project/Add Reference_
+1. Add the directory from _/ImageShading_ to your solution
+2. In Visual Studio, click _Project/Add Reference_
 3. in _/Project_ locate the library
 4. Click **Add Reference**
 

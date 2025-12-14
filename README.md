@@ -53,7 +53,14 @@ public static void Main(string[] args)
 }
 ```
 
-#### Automatically Opening the Image
+### Result
+Input: <br>
+<img src="resources/in_image.png" alt="Input Image" width="200"/>
+
+Output: <br>
+<img src="resources/out_image.png" alt="Output Image" width="200"/>
+
+### Opening the Image
 After the image is rendered, you can then open the image in
 windows default image viewer. There are 2 ways of achieving it:
 <br>
@@ -67,14 +74,7 @@ ImageShading.Core.Painter.ShadeImage(
     true
 );
 ```
-or
+or you can open any image
 ```csharp
 ImageShading.Core.Painter.OpenImage("out_image.png");
 ```
-
-### Result
-Input: <br>
-<img src="resources/in_image.png" alt="Input Image" width="200"/>
-
-Output: <br>
-<img src="resources/out_image.png" alt="Output Image" width="200"/>

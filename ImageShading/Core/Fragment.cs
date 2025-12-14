@@ -15,10 +15,12 @@ public abstract class Fragment
     {
         if (!_screenBuffer.HasValue) return new Vec4(0f);
         
-        var dnX = (int)(x * _screenBuffer.Value.Width);
-        var dnY = (int)(y * _screenBuffer.Value.Height);
-        var index = (dnY % _screenBuffer.Value.Height) * _screenBuffer.Value.Stride +
-                    (dnX % _screenBuffer.Value.Width) * 4;
+        var dnX = (int)(x * _screenBuffer.Value.Width) % _screenBuffer.Value.Width;
+        var dnY = (int)(y * _screenBuffer.Value.Height) % _screenBuffer.Value.Height;
+        if (dnX < 0f) dnX = _screenBuffer.Value.Width + dnX;
+        if (dnY < 0f) dnY = _screenBuffer.Value.Height + dnY;
+        
+        var index = dnY * _screenBuffer.Value.Stride + dnX * 4;
         
         return new Vec4(
             _screenBuffer.Value.Data[index + 2] / 255f,

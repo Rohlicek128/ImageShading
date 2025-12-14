@@ -40,6 +40,10 @@ public struct Vec2
     {
         return new Vec2(left.X * right.X, left.Y * right.Y);
     }
+    public static Vec2 operator*(Vec2 left, float scalar)
+    {
+        return new Vec2(left.X * scalar, left.Y * scalar);
+    }
     public void operator*=(Vec2 other)
     {
         X *= other.X;
@@ -54,6 +58,10 @@ public struct Vec2
     public static Vec2 operator/(Vec2 left, Vec2 right)
     {
         return new Vec2(left.X / right.X, left.Y / right.Y);
+    }
+    public static Vec2 operator/(Vec2 left, float scalar)
+    {
+        return new Vec2(left.X / scalar, left.Y / scalar);
     }
     public void operator/=(Vec2 other)
     {
@@ -89,6 +97,11 @@ public struct Vec2
     {
         var lenght = Lenght();
         return new Vec2(X / lenght, Y / lenght);
+    }
+    
+    public static float Dot(Vec2 left, Vec2 right)
+    {
+        return left.X * right.X + left.Y * right.Y;
     }
     
 

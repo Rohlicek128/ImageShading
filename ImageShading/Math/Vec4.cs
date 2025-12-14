@@ -49,6 +49,20 @@ public struct Vec4
         Z = vec3.Z;
         W = w;
     }
+    public Vec4(Vec2 vec2, float z, float w)
+    {
+        X = vec2.X;
+        Y = vec2.Y;
+        Z = z;
+        W = w;
+    }
+    public Vec4(Vec2 xy, Vec2 zw)
+    {
+        X = xy.X;
+        Y = xy.Y;
+        Z = zw.X;
+        W = zw.Y;
+    }
 
     public static Vec4 operator+(Vec4 left, Vec4 right)
     {
@@ -78,6 +92,10 @@ public struct Vec4
     {
         return new Vec4(left.X * right.X, left.Y * right.Y, left.Z * right.Z, left.W * right.W);
     }
+    public static Vec4 operator*(Vec4 left, float scalar)
+    {
+        return new Vec4(left.X * scalar, left.Y * scalar, left.Z * scalar, left.W * scalar);
+    }
     public void operator*=(Vec4 other)
     {
         X *= other.X;
@@ -96,6 +114,10 @@ public struct Vec4
     public static Vec4 operator/(Vec4 left, Vec4 right)
     {
         return new Vec4(left.X / right.X, left.Y / right.Y, left.Z / right.Z, left.W / right.W);
+    }
+    public static Vec4 operator/(Vec4 left, float scalar)
+    {
+        return new Vec4(left.X / scalar, left.Y / scalar, left.Z / scalar, left.W / scalar);
     }
     public void operator/=(Vec4 other)
     {
@@ -137,6 +159,11 @@ public struct Vec4
     {
         var lenght = Lenght();
         return new Vec4(X / lenght, Y / lenght, Z / lenght, W / lenght);
+    }
+    
+    public static float Dot(Vec4 left, Vec4 right)
+    {
+        return left.X * right.X + left.Y * right.Y + left.Z * right.Z + left.W * right.W;
     }
     
 

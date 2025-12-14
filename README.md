@@ -1,6 +1,8 @@
 # Image Shading
 A C# library that allows you to write your own fragment shader.
 You can then use your shader to edit an image.
+<br>
+Library is implemented using a software renderer.
 
 ## Integration
 
@@ -20,19 +22,19 @@ You can then use your shader to edit an image.
 ### Custom Fragment Shader
 Example shader for color inversion:
 ```csharp
-using System.Drawing;
 using ImageShading.Core;
+using ImageShading.Math;
 
 public class InverShader : Fragment
 {
-    public override Color SetFragment(int x, int y)
+    public override Vec4 SetFragment(Vec2 coordinates)
     {
-        var pixel = SampleScreenBuffer(x, y);
-        return Color.FromArgb(
-            255,
-            255 - pixel.R,
-            255 - pixel.G,
-            255 - pixel.B
+        Vec4 pixel = SampleScreenBuffer(coordinates);
+        return new Vec4(
+            1f - pixel.R,
+            1f - pixel.G,
+            1f - pixel.B,
+            pixel.A
         );
     }
 }
@@ -49,6 +51,25 @@ public static void Main(string[] args)
         new InverShader() 
     );
 }
+```
+
+#### Automatically Opening the Image
+After the image is rendered, you can then open the image in
+windows default image viewer. There are 2 ways of achieving it:
+<br>
+<br>
+Add **true** at the end
+```csharp
+ImageShading.Core.Painter.ShadeImage(
+    "in_image.jpg",
+    "out_image.png",
+    new InverShader(),
+    true
+);
+```
+or
+```csharp
+ImageShading.Core.Painter.OpenImage("out_image.png");
 ```
 
 ### Result
